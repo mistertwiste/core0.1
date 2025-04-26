@@ -35,13 +35,23 @@ if send and user_text:
     prompt = generate_prompt(user_text)
 
     # OpenAI-Call
-    resp = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "Du bist ein hilfreicher Assistent."},
-            {"role": "user", "content": prompt},
-        ],
-    )
+    from openai import OpenAI
+# ...
+
+# ganz oben, direkt nach dem Laden des API-Keys
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# …
+
+# wo Du die Completion anforderst
+resp = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "Du bist ein hilfreicher Assistent."},
+        {"role": "user",   "content": prompt}
+    ],
+)
+
     answer = resp.choices[0].message.content.strip()
     st.session_state.messages.append({"role": "assistant", "content": answer})
 
