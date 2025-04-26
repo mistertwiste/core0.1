@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple GPT-4o Chat MVP</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2em auto; }
+    #chat { border: 1px solid #ccc; padding: 1em; height: 400px; overflow-y: auto; }
+    .msg { margin: 0.5em 0; }
+    .user { text-align: right; color: blue; }
+    .bot { text-align: left; color: green; }
+  </style>
+</head>
+<body>
+  <h1>GPT-4o Chat-MVP</h1>
+  <div id="chat"></div>
+  <form id="form">
+    <input type="text" id="input" autocomplete="off" style="width:80%" />
+    <button type="submit">Senden</button>
+  </form>
+
+  <script>
+    const chatDiv = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      
+      // 1) Nutzer-Nachricht anzeigen
+      const uDiv = document.createElement("div");
+      uDiv.className = "msg user";
+      uDiv.textContent = text;
+      chatDiv.appendChild(uDiv);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+      input.value = "";
+
+      // 2) Anfrage an unser Flask-Backend
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
+
+      // 3) Bot-Antwort anzeigen
+      const bDiv = document.createElement("div");
+      bDiv.className = "msg bot";
+      bDiv.textContent = data.answer;
+      chatDiv.appendChild(bDiv);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    });
+  </script>
+</body>
+</html>
